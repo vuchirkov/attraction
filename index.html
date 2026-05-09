@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Притяжение - новый уровень загородной жизни. План поселка, описание и контакты в Telegram и MAX.">
+  <title>Притяжение - новый уровень загородной жизни</title>
+  <!-- Font Awesome 6 (бесплатные иконки) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background-color: #fefcf5;
+      color: #2c3e2f;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+    }
+
+    /* контейнер */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    .header {
+      background: #ffffffdd;
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      border-bottom: 1px solid #e2e6da;
+    }
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .logo {
+      font-size: 1.7rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #2b6e3c, #5ba475);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-weight: 500;
+      color: #2c5e2f;
+      transition: 0.2s;
+      font-size: 1rem;
+    }
+    .nav-links a:hover {
+      color: #3f8e4b;
+      border-bottom: 2px solid #5ba475;
+      padding-bottom: 4px;
+    }
+
+    /* кнопки */
+    .btn {
+      display: inline-block;
+      background-color: #2f6b3c;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 60px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.2s;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .btn:hover {
+      background-color: #1f542a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(47, 107, 60, 0.2);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #2f6b3c;
+      color: #2f6b3c;
+    }
+    .btn-outline:hover {
+      background: #2f6b3c;
+      color: white;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(120deg, #eef6e7 0%, #ffffff 80%);
+      padding: 4rem 0;
+      border-bottom: 1px solid #dde8d5;
+    }
+    .hero-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 3rem;
+      justify-content: space-between;
+    }
+    .hero-text {
+      flex: 1.2;
+    }
+    .hero-text h1 {
+      font-size: 3.2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: #1e4024;
+    }
+    .hero-text p {
+      font-size: 1.2rem;
+      color: #4a5c48;
+      margin-bottom: 2rem;
+    }
+    .hero-badge {
+      background: #e9f3e5;
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 60px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #2f6b3c;
+      margin-bottom: 1rem;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+    .stat {
+      font-weight: 600;
+    }
+    .stat span {
+      font-size: 1.7rem;
+      display: block;
+      color: #2f6b3c;
+    }
+    .hero-image {
+      flex: 0.8;
+      background: #e3efdd;
+      border-radius: 48px;
+      padding: 0.5rem;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+    }
+    .hero-image img {
+      width: 100%;
+      border-radius: 40px;
+      display: block;
+    }
+
+    /* Секции общие */
+    .section {
+      padding: 5rem 0;
+      border-bottom: 1px solid #e9efdf;
+    }
+    .section-title {
+      font-size: 2.2rem;
+      margin-bottom: 2.5rem;
+      font-weight: 600;
+      position: relative;
+      display: inline-block;
+    }
+    .section-title:after {
+      content: '';
+      display: block;
+      width: 60%;
+      height: 3px;
+      background: #7cbb7a;
+      margin-top: 10px;
+      border-radius: 3px;
+    }
+
+    /* ПЛАН ПОСЕЛКА (карта/изображение) */
+    .plan-container {
+      background: #f9faf3;
+      border-radius: 40px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
+    }
+    .plan-img {
+      width: 100%;
+      max-width: 1100px;
+      border-radius: 28px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+      background: #e2eddb;
+      cursor: pointer;
+    }
+    .plan-img:hover {
+      transform: scale(1.01);
+    }
+    .caption {
+      margin-top: 1rem;
+      color: #5e7062;
+      font-size: 0.9rem;
+    }
+    .download-plan {
+      margin-top: 1.5rem;
+    }
+
+    /* Описание / преимущества */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .feature-card {
+      background: #ffffff;
+      padding: 1.8rem;
+      border-radius: 32px;
+      transition: all 0.2s;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+      border: 1px solid #eef3e5;
+    }
+    .feature-card i {
+      font-size: 2.5rem;
+      color: #4c9a5e;
+      margin-bottom: 1rem;
+    }
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.8rem;
+    }
+    .feature-card p {
+      color: #556b52;
+    }
+
+    /* Сообщества — телеграм и "макс" (WhatsApp) */
+    .social-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .social-card {
+      background: white;
+      border-radius: 60px;
+      padding: 0.9rem 2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid #e2eed9;
+      text-decoration: none;
+      color: #2c5e2f;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+    .social-card i {
+      font-size: 2rem;
+    }
+    .social-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+      background: #f9fff5;
+    }
+    .telegram i { color: #26A5E4; }
+    .whatsapp i { color: #25D366; }
+
+    /* контакт / футер */
+    .footer {
+      background: #eef4e7;
+      padding: 2.5rem 0;
+      text-align: center;
+      color: #3e5a3a;
+    }
+    .footer a {
+      color: #2f6b3c;
+      text-decoration: none;
+    }
+
+    @media (max-width: 800px) {
+      .hero-text h1 {
+        font-size: 2.2rem;
+      }
+      .nav {
+        flex-direction: column;
+        text-align: center;
+      }
+      .nav-links {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1.2rem;
+      }
+      .section {
+        padding: 3rem 0;
+      }
+      .section-title {
+        font-size: 1.8rem;
+      }
+      .social-card {
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+      }
+    }
+
+    /* лайтбокс эффект для картинки (простое модальное окно) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.85);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .modal-content {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 24px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <div class="logo">🌳 Притяжение</div>
+      <ul class="nav-links">
+        <li><a href="#main">Главная</a></li>
+        <li><a href="#plan">План поселка</a></li>
+        <li><a href="#about">О поселке</a></li>
+        <li><a href="#connect">Сообщества</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- Hero секция -->
+  <section id="main" class="hero">
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <div class="hero-badge">🏡 Ваше пространство для жизни</div>
+        <h1>Загородный поселок<br>«Притяжение»</h1>
+        <p>Берег реки Кама, свежий воздух, развитая инфраструктура. Откройте для себя идеальный баланс загородной жизни и городского комфорта.</p>
+        <a href="#plan" class="btn">Смотреть план поселка →</a>
+        <div class="hero-stats">
+          <div class="stat"><span>76 га</span> территории</div>
+          <div class="stat"><span>392</span> участка</div>
+          <div class="stat"><span>более 10 га</span> общих зон отдыха и рекреации</div>
+          <div class="stat"><span>15 мин</span> до города</div>
+        </div>
+      </div>
+      <div class="hero-image">
+        <!-- иллюстрация природы (заглушка, можно заменить) -->
+        <img src="https://placehold.co/600x500/e5f0dd/2f6b3c?text=🌲+Лесной+пейзаж" alt="Природа поселка">
+      </div>
+    </div>
+  </section>
+
+  <!-- План поселка (основное по требованию) -->
+  <section id="plan" class="section">
+    <div class="container">
+      <h2 class="section-title">🗺️ План поселка</h2>
+      <div class="plan-container">
+        <img
+          src="img/plan.jpeg"
+          alt="План загородного поселка"
+          class="plan-img"
+          id="planImage"
+          style="cursor:pointer"
+        >
+        <div class="caption">
+          📍 Генеральный план: участки, зоны отдыха, центральная площадь, детские площадки.
+        </div>
+        <div class="download-plan">
+          <a href="source/plan.pdf" class="btn-outline btn" download style="background:transparent;">
+            📥 Скачать план (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Описание поселка + преимущества -->
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="section-title">🌲 О поселке «Притяжение»</h2>
+      <p style="font-size:1.2rem; max-width:800px; margin-bottom:2rem;">Поселок расположен в живописном месте в 15 минутах от города. Продуманная инфраструктура, круглогодичный подъезд, все коммуникации — для комфортной жизни вашей семьи.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <i class="fas fa-tree"></i>
+          <h3>Природа</h3>
+          <p>Берег Камы, прогулочные аллеи, спортивные площадки и зоны для отдыха. Экологически чистый район.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-water"></i>
+          <h3>Коммуникации</h3>
+          <p>Центральное водоснабжение, газ, электричество 15 кВт, высокоскоростной интернет.</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-shield-alt"></i>
+          <h3>Безопасность</h3>
+          <p>Видеонаблюдение, контролируемый доступ, охрана и система «Умный дом».</p>
+        </div>
+        <div class="feature-card">
+          <i class="fas fa-child"></i>
+          <h3>Для всей семьи</h3>
+          <p>Детские и спортивные площадки, беседки, мини-парк и детский сад, торговые галереи в шаговой доступности.</p>
+        </div>
+      </div>
+      <div style="margin-top: 2rem; background:#eef1e4; border-radius: 28px; padding: 1.5rem 2rem; text-align: center;">
+        <p style="font-size:1.1rem; font-weight:500;">✨ Участки от 8 соток. Возможность построить дом по индивидуальному проекту. <br>Присоединяйтесь к нашему сообществу — здесь живут люди, ценящие тишину и комфорт.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Сообщества: Telegram и WhatsApp (в ТЗ "телеграмм и макс" -> "макс" вероятно WhatsApp) -->
+  <section id="connect" class="section">
+    <div class="container">
+      <h2 class="section-title">💬 Присоединяйтесь к сообществу</h2>
+      <p style="margin-bottom: 2rem;">Актуальные новости поселка, объявления, общение с соседями, помощь в строительстве – всё в наших группах.</p>
+      <div class="social-links">
+        <!-- Ссылка на Telegram (замените href на реальную ссылку вашей группы) -->
+        <a href="#" class="social-card telegram" id="telegramLink" target="_blank">
+          <i class="fab fa-telegram"></i> Telegram-чат
+        </a>
+        <!-- Ссылка на WhatsApp (в тексте задания "макс" — предположительно WhatsApp / мессенджер) -->
+        <a href="#" class="social-card max" id="maxLink" target="_blank">
+          <i class="fas fa-comment-dots"></i> MAX-сообщество
+        </a>
+      </div>
+      <div style="margin-top: 2rem; background: #fff6e5; border-left: 5px solid #73a56b; padding: 1rem 1.8rem; border-radius: 28px;">
+        <p><i class="fas fa-pen"></i> <strong>Важно:</strong> замените ссылки на группы в Telegram и WhatsApp задав <strong>реальные URL</strong>. Для Telegram обычно ссылка вида <code>https://t.me/+ваш_код_или_username</code>, для WhatsApp — <code>https://chat.whatsapp.com/...</code> или <code>https://wa.me/номертелефона?text=...</code> в зависимости от формата.</p>
+        <p style="margin-top: 8px;">🔧 Инструкция по замене: откройте HTML-файл, найдите скрипт внизу или прямо в атрибутах <strong>href</strong> у элементов с id="telegramLink" и id="whatsappLink". Либо раскомментируйте и вставьте свои ссылки.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <p>🌿 Загородный поселок «Притяжение» — жизнь за городом без компромиссов.</p>
+    <p style="margin-top: 10px;">📞 Консультации: +7 (951) 946-43-60 (отдел продаж) | <a href="#">Политика конфиденциальности</a></p>
+    <p style="margin-top: 18px; font-size: 0.8rem;">© 2025 «Притяжение». Все права защищены.</p>
+  </div>
+</footer>
+
+<!-- Модальное окно для увеличения плана (приятный UX) -->
+<div id="imageModal" class="modal">
+  <img class="modal-content" id="modalImg">
+</div>
+
+<script>
+  // 1. Замена ссылок на группы ТГ и вотсап – здесь вы можете вставить свои актуальные URL
+  // ========== НАСТРОЙТЕ ВАШИ ССЫЛКИ ПРЯМО ЗДЕСЬ ==========
+  const TELEGRAM_GROUP_URL = "https://t.me/your_telegram_group";   // 👈 ЗАМЕНИТЕ на ссылку вашего Telegram чата
+  const MAX_GROUP_URL = "https://chat.whatsapp.com/your_invite_code";  // 👈 ЗАМЕНИТЕ на ссылку-приглашение в WhatsApp группу
+
+  // Назначаем ссылки, если не заглушки:
+  const tgLink = document.getElementById('telegramLink');
+  const maxLink = document.getElementById('maxLink');
+  if (tgLink) {
+    if (TELEGRAM_GROUP_URL !== "https://t.me/your_telegram_group") {
+      tgLink.href = TELEGRAM_GROUP_URL;
+    } else {
+      // Чтобы пользователь не забыл поменять — показываем предупреждение при клике
+      tgLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('⚠️ Пожалуйста, укажите реальную ссылку на Telegram-группу в коде!\nОтредактируйте переменную TELEGRAM_GROUP_URL в JavaScript или href тега.');
+      });
+    }
+  }
+
+  if (maxLink) {
+    if (MAX_GROUP_URL !== "https://chat.whatsapp.com/your_invite_code") {
+      maxLink.href = WHATSAPP_GROUP_URL;
+    } else {
+      maxLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('⚠️ Добавьте реальную ссылку на WhatsApp-группу! (переменная WHATSAPP_GROUP_URL)');
+      });
+    }
+  }
+
+  // 2. Увеличение картинки плана при клике (модальное окно)
+  const planImage = document.getElementById('planImage');
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImg');
+
+  if (planImage) {
+    planImage.addEventListener('click', function() {
+      modal.style.display = 'flex';
+      modalImg.src = this.src;
+    });
+  }
+
+  // Закрыть модальное окно
+  modal.addEventListener('click', function() {
+    modal.style.display = 'none';
+  });
+
+  // Для демонстрации скачивания - просто информируем, но можно отключить
+  const fakeDownloadBtn = document.getElementById('fakeDownload');
+  if (fakeDownloadBtn) {
+    fakeDownloadBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Полная версия плана в высоком разрешении будет доступна после замены изображения. Загрузите свой файл и укажите путь к нему в теге img (id="planImage").');
+    });
+  }
+
+  // Также подсказка, что можно заменить картинку плана.
+  console.log("✅ Сайт загородного поселка загружен. Замените изображение плана и ссылки на мессенджеры.");
+  // Для удобства добавим подсказку в консоль, но это не критично.
+</script>
+
+<!--
+    ======================== ИНСТРУКЦИЯ =========================
+    1. ЗАМЕНА ПЛАНА:
+        - Найдите в коде секцию с id="plan" и внутри тег <img class="plan-img">
+        - Измените атрибут src="..." на путь к вашему файлу, например: src="images/plan_poselka.jpg"
+        - Желательно положить изображение в папку images рядом с index.html
+
+    2. ССЫЛКИ НА ГРУППЫ (Telegram и WhatsApp - "макс" мессенджер)
+        - Внутри тега <script> найдите переменные TELEGRAM_GROUP_URL и WHATSAPP_GROUP_URL
+        - Вставьте актуальные ссылки:
+            * для Telegram: https://t.me/ваш_чат_или_юзернейм
+            * для WhatsApp: https://chat.whatsapp.com/... (ссылка-приглашение)
+              или https://wa.me/79XXXXXXXXX?text=Здравствуйте (для связи с менеджером)
+        - Альтернативно можно изменить напрямую href у id="telegramLink" и "whatsappLink"
+
+    3. РАЗМЕЩЕНИЕ САЙТА:
+        - Сохраните этот код как index.html
+        - Загрузите на ваш хостинг (любой статический хостинг, например Timeweb, Beget, или GitHub Pages)
+        - Привязать домен к папке с сайтом.
+
+    4. ВСПОМОГАТЕЛЬНЫЕ СОВЕТЫ:
+        - Для замены фоновой картинки в hero-image можно также заменить src.
+        - Текст описания, статистики, название поселка легко редактируются прямо в HTML.
+        - Сайт адаптивен под телефоны и планшеты.
+
+    ==============================================================
+-->
+</body>
+</html>
