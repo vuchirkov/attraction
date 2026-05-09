@@ -134,12 +134,13 @@
     .hero-badge {
       background: #e9f3e5;
       display: inline-block;
-      padding: 6px 14px;
+      padding: 10px 20px;          /* Увеличили отступы */
       border-radius: 60px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #2f6b3c;
-      margin-bottom: 1rem;
+      font-size: 1.3rem;           /* Было 0.8rem — стало значительно крупнее */
+      font-weight: 500;            /* Сделали полужирным (было 500) */
+      color: #1f542a;              /* Чуть темнее для контраста */
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.3px;       /* Небольшой межбуквенный интервал для читаемости */
     }
     .hero-stats {
       display: flex;
@@ -360,7 +361,7 @@
   <section id="main" class="hero">
     <div class="container hero-grid">
       <div class="hero-text">
-        <div class="hero-badge">🏡 Ваше пространство для жизни</div>
+        <div class="hero-badge">🏡 Новый уровень загородной жизни</div>
         <h1>Загородный поселок<br>«Притяжение»</h1>
         <p>Берег реки Кама, свежий воздух, развитая инфраструктура. Откройте для себя идеальный баланс загородной жизни и городского комфорта.</p>
         <a href="#plan" class="btn">Смотреть план поселка →</a>
@@ -450,23 +451,24 @@
           <i class="fas fa-comment-dots"></i> MAX-сообщество
         </a>
       </div>
-      <div style="margin-top: 2rem; background: #fff6e5; border-left: 5px solid #73a56b; padding: 1rem 1.8rem; border-radius: 28px;">
-        <p><i class="fas fa-pen"></i> <strong>Важно:</strong> замените ссылки на группы в Telegram и WhatsApp задав <strong>реальные URL</strong>. Для Telegram обычно ссылка вида <code>https://t.me/+ваш_код_или_username</code>, для WhatsApp — <code>https://chat.whatsapp.com/...</code> или <code>https://wa.me/номертелефона?text=...</code> в зависимости от формата.</p>
-        <p style="margin-top: 8px;">🔧 Инструкция по замене: откройте HTML-файл, найдите скрипт внизу или прямо в атрибутах <strong>href</strong> у элементов с id="telegramLink" и id="whatsappLink". Либо раскомментируйте и вставьте свои ссылки.</p>
-      </div>
-    </div>
-  </section>
-</main>
+      <!-- <div style="margin-top: 2rem; background: #fff6e5; border-left: 5px solid #73a56b; padding: 1rem 1.8rem; border-radius: 28px;">
+         <p><i class="fas fa-pen"></i> <strong>Важно:</strong> замените ссылки на группы в Telegram и WhatsApp задав <strong>реальные URL</strong>. Для Telegram обычно ссылка вида <code>https://t.me/+ваш_код_или_username</code>, для WhatsApp — <code>https://chat.whatsapp.com/...</code> или <code>https://wa.me/номертелефона?text=...</code> в зависимости от формата.</p>
+         <p style="margin-top: 8px;">🔧 Инструкция по замене: откройте HTML-файл, найдите скрипт внизу или прямо в атрибутах <strong>href</strong> у элементов с id="telegramLink" и id="whatsappLink". Либо раскомментируйте и вставьте свои ссылки.</p>
+       </div>
+       -->
+     </div>
+   </section>
+ </main>
 
-<footer class="footer">
-  <div class="container">
-    <p>🌿 Загородный поселок «Притяжение» — жизнь за городом без компромиссов.</p>
-    <p style="margin-top: 10px;">📞 Консультации: +7 (951) 946-43-60 (отдел продаж) | <a href="#">Политика конфиденциальности</a></p>
-    <p style="margin-top: 18px; font-size: 0.8rem;">© 2025 «Притяжение». Все права защищены.</p>
-  </div>
-</footer>
+ <footer class="footer">
+   <div class="container">
+     <p>🌿 Загородный поселок «Притяжение» — жизнь за городом без компромиссов.</p>
+     <p style="margin-top: 10px;">📞 Консультации: +7 (951) 946-43-60 (отдел продаж) | <a href="#">Политика конфиденциальности</a></p>
+     <p style="margin-top: 18px; font-size: 0.8rem;">© 2025 «Притяжение». Все права защищены.</p>
+   </div>
+ </footer>
 
-<!-- Модальное окно для увеличения плана (приятный UX) -->
+ <!-- Модальное окно для увеличения плана (приятный UX) -->
 <div id="imageModal" class="modal">
   <img class="modal-content" id="modalImg">
 </div>
