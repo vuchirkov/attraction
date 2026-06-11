@@ -190,35 +190,6 @@
       border-radius: 3px;
     }
 
-    /* ПЛАН ПОСЕЛКА (карта/изображение) */
-    .plan-container {
-      background: #f9faf3;
-      border-radius: 40px;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
-    }
-    .plan-img {
-      width: 100%;
-      max-width: 1280px;
-      border-radius: 28px;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s ease;
-      background: #e2eddb;
-      cursor: pointer;
-    }
-    .plan-img:hover {
-      transform: scale(1.01);
-    }
-    .caption {
-      margin-top: 1rem;
-      color: #5e7062;
-      font-size: 0.9rem;
-    }
-    .download-plan {
-      margin-top: 1.5rem;
-    }
-
     /* Описание / преимущества */
     .features-grid {
       display: grid;
@@ -536,40 +507,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <style>
-    #map {
-      height: 400px;
-      width: 100%;
-      border-radius: 24px;
-      margin: 20px 0;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-    .lot-info-panel {
-      background: white;
-      padding: 12px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-top: 20px;
-      font-family: inherit;
-      border-left: 5px solid #2f6b3c;
-    }
-    .lot-info-panel h4 {
-      margin: 0 0 5px;
-      color: #2c5e2f;
-    }
-    .lot-info-panel p {
-      margin: 5px 0;
-    }
-  </style>
-
-  <!-- Контейнер для карты -->
-  <div id="map"></div>
-  <!-- Панель для отображения информации при наведении -->
-  <div id="lotInfo" class="lot-info-panel">
-    <h4>Информация об участке</h4>
-    <p>Наведите курсор на участок на карте</p>
-  </div>
-
   <!-- Подключение D3.js -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
 
@@ -580,67 +517,18 @@
       padding: 10px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.05);
       margin: 20px 0;
-      overflow-x: auto;
-      overflow-y: visible;
-    }
-    .svg-container svg {
-      display: block;
-      min-width: 1400px;  /* минимальная ширина для читаемости */
-      width: 100%;
-      height: auto;
-      shape-rendering: geometricPrecision; /* чёткие линии */
-    }
-    .lot {
-      stroke: white;
-      stroke-width: 2;   /* было 1.5 */
-      transition: fill 0.2s, stroke-width 0.2s;
-      cursor: pointer;
-    }
-    .lot.booked {
-      fill: #ffcc80;
-    }
-    .lot.sold {
-      fill: #ef9a9a;
-    }
-    .lot:hover {
-      stroke: #ffd700;
-      stroke-width: 3;
-      filter: brightness(0.96);
-    }
-    .lot-info-panel {
-      background: white;
-      padding: 12px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-      font-family: inherit;
-      border-left: 5px solid #2f6b3c;
-    }
-  </style>
-
-  <div id="lotInfoPanel" class="lot-info-panel">
-    <h4>Информация об участке</h4>
-    <p>Наведите курсор на участок, чтобы увидеть данные</p>
-  </div>
-
-  <div class="svg-container" id="mapContainer"></div>
-
-  <style>
-    .svg-container {
-      background: #f8faf5;
-      border-radius: 24px;
-      padding: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-      margin: 20px 0;
       overflow: auto;
       position: relative;
+      width: 100%;
+      height: 600;
     }
     .svg-container svg {
       display: block;
-      min-width: 900px;
-      width: 90%;
-      height: auto;
+      width: 100%;
+      height: 100%;
       shape-rendering: geometricPrecision;
+      min-width: 900px;
+      max-height: 1000px;
     }
     .lot {
       stroke: black;
@@ -694,13 +582,19 @@
     }
   </style>
 
-  <div id="lotPopup" class="lot-popup" style="display: none;"></div>
+  <!--<div id="lotPopup" class="lot-popup" style="display: none;"></div>-->
+  <div id="lotPopup" class="lot-popup"></div>
   <div class="svg-container" id="mapContainer"></div>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
-    // ========== РЕАЛЬНЫЕ ДАННЫЕ (замените при необходимости) ==========
-    const realLotData = {}; // заполните своими
+    // ================== НАСТРОЙКИ (измените под себя) ==================
+    const GEOJSON_PATH = 'data/planJson.geojson';   // путь к вашему файлу
+    // Если у вас есть реальные данные статусов и цен из БД, заполните realLotData
+
+    const realLotData = {}; // пример: { 4814: { status: "free", price: "1 200 000 ₽" }, ... }
+
+    // Демо-генерация (замените на реальные данные)
     function getDemoStatus() {
       const r = Math.random();
       if (r < 0.6) return "free";
@@ -712,6 +606,7 @@
       if (status === "booked") return "1 150 000 ₽";
       return "1 000 000 ₽";
     }
+    // Функция вычисления площади (в сотках)
     function calculateArea(coords) {
       let area = 0;
       const n = coords.length;
@@ -721,15 +616,14 @@
         area += x1 * y2 - x2 * y1;
       }
       area = Math.abs(area) / 2;
-      const sotki = area / 100;
-      return Math.round(sotki * 10) / 10;
+      return Math.round((area / 100) * 10) / 10; // сотки с одним знаком
     }
     // ================================================================
 
-    fetch('data/planJson.geojson')  // ← ваш путь
+    fetch(GEOJSON_PATH)
       .then(response => response.json())
       .then(data => {
-        // 1. Сначала собираем все координаты из всех геометрий (и LineString, и Polygon)
+        // 1. Собрать все координаты (включая возможные LineString)
         let allCoords = [];
         data.features.forEach(f => {
           if (f.geometry.type === 'LineString') {
@@ -738,78 +632,71 @@
             f.geometry.coordinates.forEach(ring => allCoords.push(...ring));
           }
         });
-
-        // 2. Вычисляем bounding box
         let minX = Math.min(...allCoords.map(p => p[0]));
         let minY = Math.min(...allCoords.map(p => p[1]));
         let maxX = Math.max(...allCoords.map(p => p[0]));
         let maxY = Math.max(...allCoords.map(p => p[1]));
 
-        // Добавляем небольшой запас (5% от ширины/высоты), чтобы края не прилипали
+        // Добавляем 5% запаса по краям
         const dx = (maxX - minX) * 0.05;
         const dy = (maxY - minY) * 0.05;
-        minX -= dx;
-        maxX += dx;
-        minY -= dy;
-        maxY += dy;
+        minX -= dx; maxX += dx;
+        minY -= dy; maxY += dy;
 
-        // 3. Преобразуем LineString в Polygon (замкнутые линии)
-        const features = data.features.map(f => {
+        // 2. Преобразуем замкнутые LineString в Polygon
+        let features = data.features.map(f => {
           if (f.geometry.type === 'LineString') {
             const coords = f.geometry.coordinates;
             const first = coords[0];
             const last = coords[coords.length-1];
             if (first[0] === last[0] && first[1] === last[1]) {
-              const polyCoords = [coords.slice(0, -1)];
               return {
                 ...f,
-                geometry: { type: 'Polygon', coordinates: polyCoords }
+                geometry: { type: 'Polygon', coordinates: [coords.slice(0, -1)] }
               };
             }
           }
           return f;
-        }); // оставляем только полигоны
+        }).filter(f => f.geometry.type === 'Polygon');
 
-        // Добавляем статусы, цены, площадь (как ранее)
+        // 3. Обогащаем свойствами
         features.forEach(f => {
-          if (f.geometry.type === 'Polygon') {
-            const fid = f.properties.fid;
-            let status, price;
-            if (realLotData[fid]) {
-              status = realLotData[fid].status;
-              price = realLotData[fid].price;
-            } else {
-              status = getDemoStatus();
-              price = getDemoPrice(status);
-            }
-            f.properties.status = status;
-            f.properties.price = price;
-            f.properties.lotNumber = fid;
-            const polyCoords = f.geometry.coordinates[0];
-            f.properties.areaSotki = calculateArea(polyCoords);
+          const fid = f.properties.fid;
+          let status, price;
+          if (realLotData[fid]) {
+            status = realLotData[fid].status;
+            price = realLotData[fid].price;
+          } else {
+            status = getDemoStatus();
+            price = getDemoPrice(status);
           }
+          f.properties.status = status;
+          f.properties.price = price;
+          f.properties.lotNumber = fid;
+          f.properties.areaSotki = calculateArea(f.geometry.coordinates[0]);
         });
 
-        // 4. Настраиваем контейнер и размеры (минимальная ширина 1200px)
+        // 4. Размеры контейнера
         const container = document.getElementById('mapContainer');
         let width = container.clientWidth;
-        if (width < 1400) width = 1400; // увеличил для лучшей видимости
-        const height = (maxY - minY) / (maxX - minX) * width;
-        const centerX = width / 2;
-        const centerY = height / 2;
+        if (width < 1200) width = 1200;   // минимальная ширина для читаемости
+        let height = (maxY - minY) / (maxX - minX) * width;
+       /* const height = 800;*/
+        const centerX = width * 0.7;
+        const centerY = height * 0.45;
 
         // 5. Создаём SVG
         const svg = d3.select("#mapContainer")
           .append("svg")
-          .attr("viewBox", `0 0 ${width} ${height}`)
-          .attr("preserveAspectRatio", "xMidYMid meet")
-          .style("cursor", "grab");
+          .attr("viewBox", `0 0 ${width} ${900}`)
+          .attr("preserveAspectRatio", "xMidYMid meet");
 
+        // Группа, которая будет поворачиваться и масштабироваться
         const rotatedGroup = svg.append("g")
-          .attr("id", "rotated-group")
-          .attr("transform", `rotate(71.5, ${centerX}, ${centerY})`);
+          .attr("id", "rotated-group");
+        rotatedGroup.attr("transform", `rotate(71.5, ${centerX}, ${centerY})`);
 
-        // 6. Масштабирование с динамическими отступами (5% от ширины)
+        // 6. Масштабирование координат (отступы по 5% от ширины)
         const marginX = width * 0.05;
         const marginY = height * 0.05;
         const scaleX = d3.scaleLinear()
@@ -817,68 +704,98 @@
           .range([marginX, width - marginX]);
         const scaleY = d3.scaleLinear()
           .domain([minY, maxY])
-          .range([height - marginY, marginY]);
+          .range([height - marginY, marginY]); // инверсия Y
 
-        // 7. Рисуем полигоны (как ранее)
+        // 7. Рисуем полигоны
         features.forEach(f => {
-          if (f.geometry.type === 'Polygon') {
-            const points = f.geometry.coordinates[0].map(([x, y]) => [scaleX(x), scaleY(y)]);
-            const pointString = points.map(p => p.join(',')).join(' ');
-            const status = f.properties.status;
-            rotatedGroup.append('polygon')
-              .attr('points', pointString)
-              .attr('class', `lot ${status}`)
-              .attr('fill', status === 'free' ? '#a5d6a7' : (status === 'booked' ? '#ffcc80' : '#ef9a9a'))
-              .attr('stroke', 'white')
-              .attr('stroke-width', 2)
-              .attr('data-lot', f.properties.lotNumber)
-              .attr('data-status', status)
-              .attr('data-price', f.properties.price)
-              .attr('data-area', f.properties.areaSotki)
-              .on('mouseover', function (event) {
-                const lot = f.properties.lotNumber;
-                const area = f.properties.areaSotki;
-                const statusText = status === 'free' ? 'Свободен' : (status === 'booked' ? 'Забронирован' : 'Продан');
-                const price = f.properties.price;
-                const popup = document.getElementById('lotPopup');
-                popup.innerHTML = `
-                        <h4>Участок №${lot}</h4>
-                        <p><strong>Площадь:</strong> ${area} сот.</p>
-                        <p><strong>Статус:</strong> ${statusText}</p>
-                        <p class="price">💰 ${price}</p>
-                    `;
-                popup.style.left = (event.pageX + 15) + 'px';
-                popup.style.top = (event.pageY - 60) + 'px';
-                popup.style.opacity = '1';
-                d3.select(this).attr('stroke-width', 3.5).attr('stroke', '#ffd700');
-              })
-              .on('mousemove', function (event) {
-                const popup = document.getElementById('lotPopup');
-                popup.style.left = (event.pageX + 15) + 'px';
-                popup.style.top = (event.pageY - 60) + 'px';
-              })
-              .on('mouseout', function () {
-                const popup = document.getElementById('lotPopup');
-                popup.style.opacity = '0';
-                d3.select(this).attr('stroke-width', 2).attr('stroke', 'white');
-              });
-          }
+          const points = f.geometry.coordinates[0].map(([x, y]) => [scaleX(x), scaleY(y)]);
+          const pointString = points.map(p => p.join(',')).join(' ');
+          const status = f.properties.status;
+          rotatedGroup.append('polygon')
+            .attr('points', pointString)
+            .attr('class', `lot ${status}`)
+            .attr('fill', status === 'free' ? '#a5d6a7' : (status === 'booked' ? '#ffcc80' : '#ef9a9a'))
+            .attr('stroke', 'white')
+            .attr('stroke-width', 2)
+            .attr('data-lot', f.properties.lotNumber)
+            .attr('data-status', status)
+            .attr('data-price', f.properties.price)
+            .attr('data-area', f.properties.areaSotki)
+            .on('mouseover', function(event) {
+              const popup = document.getElementById('lotPopup');
+              popup.innerHTML = `
+                            <h4>Участок №${f.properties.lotNumber}</h4>
+                            <p><strong>Площадь:</strong> ${f.properties.areaSotki} сот.</p>
+                            <p><strong>Статус:</strong> ${status === 'free' ? 'Свободен' : (status === 'booked' ? 'Забронирован' : 'Продан')}</p>
+                            <p class="price">💰 ${f.properties.price}</p>
+                        `;
+              popup.style.left = (event.pageX + 15) + 'px';
+              popup.style.top = (event.pageY - 60) + 'px';
+              popup.style.opacity = '1';
+              d3.select(this).attr('stroke-width', 3.5).attr('stroke', '#ffd700');
+            })
+            .on('mousemove', function(event) {
+              const popup = document.getElementById('lotPopup');
+              popup.style.left = (event.pageX + 15) + 'px';
+              popup.style.top = (event.pageY - 60) + 'px';
+            })
+            .on('mouseout', function() {
+              document.getElementById('lotPopup').style.opacity = '0';
+              d3.select(this).attr('stroke-width', 2).attr('stroke', 'white');
+            });
         });
 
-        // 8. Зум и панорамирование
+// 8. РУЧНАЯ НАСТРОЙКА ОТОБРАЖЕНИЯ (вместо автоцентрирования)
+        /* const manualOffsetX = 0;      // смещение по X (пиксели)
+         const manualOffsetY = -180;   // смещение по Y (отрицательное = поднять)
+         const manualScale = 0.65;     // масштаб (1 = 100%)
+
+    /*   setTimeout(() => {
+           const bbox = rotatedGroup.node().getBBox();
+           const svgRect = svg.node().getBoundingClientRect();
+
+           let translateX = (svgRect.width - bbox.width * manualScale) / 2 - bbox.x * manualScale;
+           let translateY = (svgRect.height - bbox.height * manualScale) / 2 - bbox.y * manualScale;
+           translateX += manualOffsetX;
+           translateY += manualOffsetY;
+
+           centeredGroup.attr("transform", `translate(${translateX}, ${translateY}) scale(${manualScale})`);
+
+           const zoom = d3.zoom()
+             .scaleExtent([0.5, 3])
+             .on("zoom", (event) => {
+               centeredGroup.attr("transform",
+                 `translate(${event.transform.x}, ${event.transform.y}) scale(${event.transform.k})`);
+             });
+           svg.call(zoom);
+           const initialTransform = d3.zoomIdentity.translate(translateX, translateY).scale(manualScale);
+           svg.call(zoom.transform, initialTransform);
+         }, 100);*/
+
         const zoom = d3.zoom()
           .scaleExtent([0.5, 4])
           .on("zoom", (event) => {
-            rotatedGroup.attr("transform", `rotate(71.5, ${centerX}, ${centerY}) translate(${event.transform.x}, ${event.transform.y}) scale(${event.transform.k})`);
+            rotatedGroup.attr("transform",
+              `translate(${event.transform.x}, ${event.transform.y})
+             scale(${event.transform.k})
+             rotate(71.5, ${centerX}, ${centerY})`);
             svg.style("cursor", event.transform.k ? "grabbing" : "grab");
           });
         svg.call(zoom);
+
+// НАЧАЛЬНАЯ НАСТРОЙКА (подберите свои цифры)
+        const initialScale = 0.85;     // масштаб
+        const initialX = 120;          // сдвиг по X (пиксели)
+        const initialY = -25;           // сдвиг по Y
+        svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(initialScale));
       })
       .catch(error => {
-        console.error('Ошибка:', error);
-        document.getElementById('mapContainer').innerHTML = '<p style="color:red;">Не удалось загрузить схему.</p>';
+        console.error('Ошибка загрузки GeoJSON:', error);
+        document.getElementById('mapContainer').innerHTML = '<p style="color:red;">Не удалось загрузить схему участков. Проверьте путь к файлу.</p>';
       });
   </script>
+  <!-- Font Awesome для иконок (опционально) -->
+  <script src="https://kit.fontawesome.com/a2e3b5c7d8.js" crossorigin="anonymous"></script>
 
   <!-- Описание поселка + преимущества -->
   <section id="about" class="section">
