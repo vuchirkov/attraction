@@ -437,6 +437,13 @@
         font-size: 1.2rem;
       }
     }
+
+    #plan {
+      font-size: 2rem;
+      margin-top: 2rem;
+      border-bottom: 3px solid #2f6b3c;
+      padding-bottom: 0.5rem;
+    }
   </style>
 </head>
 <body>
@@ -584,7 +591,9 @@
 
   <!--<div id="lotPopup" class="lot-popup" style="display: none;"></div>-->
   <div id="lotPopup" class="lot-popup"></div>
+  <h2 id="plan">План поселка</h2>
   <div class="svg-container" id="mapContainer"></div>
+
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
@@ -756,7 +765,7 @@
         rotatedGroup.append('polygon')
           .attr('points', pointString)
           .attr('class', `lot ${status}`)
-          .attr('fill', status === 'free' ? '#a5d6a7' : (status === 'book' ? '#00A2E8' :  (status === 'sold' ? '#ef9a9a' : '#E8CF00')))
+          .attr('fill', status === 'free' ? '#a5d6a7' : (status === 'book' ? '#00A2E8' :  (status === 'sold' ? '#ef9a9a' : (status === 'rent' ? '#9FFCFD' : '#E8CF00'))))
           .attr('stroke', 'white')
           .attr('stroke-width', 2)
           .attr('data-lot', f.properties.lotNumber)
