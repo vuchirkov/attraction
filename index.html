@@ -593,18 +593,32 @@
     const ROADS_PATH = 'data/roads.geojson';     // ← ваш файл с дорогами (LineString)
     // Если у вас есть реальные данные статусов и цен из БД, заполните realLotData
 
-    const realLotData = {}; // пример: { 4814: { status: "free", price: "1 200 000 ₽" }, ... }
+    // В начале, после загрузки GeoJSON, делаем запрос к API
+    let lotDataFromDB = {};
+
+    async function loadLotData() {
+      try {
+        // Замените URL на адрес вашего API
+        const response = await fetch('https://кппритяжение.рф/api.php');
+        if (!response.ok) throw new Error('Ошибка загрузки данных');
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Ошибка при загрузке данных:', error);
+        return {}; // В случае ошибки возвращаем пустой объект
+      }
+    }
 
     // Демо-генерация (замените на реальные данные)
     function getDemoStatus() {
       const r = Math.random();
       if (r < 0.6) return "free";
-      if (r < 0.8) return "booked";
+      if (r < 0.8) return "book";
       return "sold";
     }
     function getDemoPrice(status) {
       if (status === "free") return "1 200 000 ₽";
-      if (status === "booked") return "1 150 000 ₽";
+      if (status === "booked") return "Продан";
       return "1 000 000 ₽";
     }
     // Функция вычисления площади (в сотках)
@@ -617,13 +631,13 @@
         area += x1 * y2 - x2 * y1;
       }
       area = Math.abs(area) / 2;
-      return Math.round((area / 100) * 10) / 10; // сотки с одним знаком
+      return Math.round((area / 100) * 100) / 100; // сотки с двумя знаками
     }
     // ================================================================
     Promise.all([
       fetch(LOTS_PATH).then(r => r.json()),
       fetch(ROADS_PATH).then(r => r.json()).catch(() => null) // если дорог нет – не страшно
-    ]).then(([lotsData, roadsData]) => {
+    ]).then(async ([lotsData, roadsData]) => {
       // 1. Сбор всех координат (и участки, и дороги) для вычисления общих границ
       let allCoords = [];
 
@@ -670,21 +684,36 @@
         return f;
       }).filter(f => f.geometry.type === 'Polygon');
 
+      const lotDataFromDB = await loadLotData();
       // 3. Обогащаем участки свойствами (статус, цена, площадь) – ваш старый код
       features.forEach(f => {
         const fid = f.properties.fid;
-        let status, price;
-        if (realLotData[fid]) {
-          status = realLotData[fid].status;
+        let areaSotki, price, statusName, lotNumber;
+        /*if (realLotData[fid]) {
+          statusCode = realLotData[fid].status_code;
           price = realLotData[fid].price;
-        } else {
-          status = getDemoStatus();
-          price = getDemoPrice(status);
+          statusName = realLotData[fid].status_name;
+          lotNumber = realLotData[fid].lot_number;
+        } else {*/
+          statusCode = getDemoStatus();
+          price = getDemoPrice(statusCode);
+        /*}*/
+        areaSotki = calculateArea(f.geometry.coordinates[0]);
+        if (lotDataFromDB[fid]) {
+          price = Math.round(lotDataFromDB[fid].price * areaSotki);
+          f.properties.areaSotki = areaSotki;
+          f.properties.statusName = lotDataFromDB[fid].status_name;
+          f.properties.statusCode = lotDataFromDB[fid].status_code;
+          f.properties.price = price;
+          f.properties.lotNumber = lotDataFromDB[fid].lot_number;
         }
-        f.properties.status = status;
-        f.properties.price = price;
-        f.properties.lotNumber = fid;
-        f.properties.areaSotki = calculateArea(f.geometry.coordinates[0]);
+        else {
+          f.properties.areaSotki = areaSotki;
+          f.properties.statusName = 'Общественная зона';
+          f.properties.statusCode = 'free';
+          f.properties.price = 'Общая';
+          f.properties.lotNumber = fid;
+        }
       });
 
       // 4. Размеры контейнера
@@ -692,8 +721,8 @@
       let width = container.clientWidth;
       if (width < 1200) width = 1200;
       const height = (maxY - minY) / (maxX - minX) * width;
-      const centerX = width / 2;
-      const centerY = height / 2;
+      const centerX = width * 0.7;
+      const centerY = height * 0.45;
 
       // 5. Создаём SVG
       const svg = d3.select("#mapContainer")
@@ -723,23 +752,33 @@
       features.forEach(f => {
         const points = f.geometry.coordinates[0].map(([x, y]) => [scaleX(x), scaleY(y)]);
         const pointString = points.map(p => p.join(',')).join(' ');
-        const status = f.properties.status;
+        const status = f.properties.statusCode;
         rotatedGroup.append('polygon')
           .attr('points', pointString)
           .attr('class', `lot ${status}`)
-          .attr('fill', status === 'free' ? '#a5d6a7' : (status === 'booked' ? '#ffcc80' : '#ef9a9a'))
+          .attr('fill', status === 'free' ? '#a5d6a7' : (status === 'book' ? '#00A2E8' :  (status === 'sold' ? '#ef9a9a' : '#E8CF00')))
           .attr('stroke', 'white')
           .attr('stroke-width', 2)
           .attr('data-lot', f.properties.lotNumber)
           .on('mouseover', function(event) {
             const popup = document.getElementById('lotPopup');
             if (!popup) return;
-            popup.innerHTML = `
+            if (f.properties.statusCode == 'free') {
+              popup.innerHTML = `
                     <h4>Участок №${f.properties.lotNumber}</h4>
                     <p><strong>Площадь:</strong> ${f.properties.areaSotki} сот.</p>
-                    <p><strong>Статус:</strong> ${status === 'free' ? 'Свободен' : (status === 'booked' ? 'Забронирован' : 'Продан')}</p>
+                    <p><strong>Статус:</strong> ${f.properties.statusName} </p>
                     <p class="price">💰 ${f.properties.price}</p>
                 `;
+            }
+            else
+            {
+              popup.innerHTML = `
+                    <h4>Участок №${f.properties.lotNumber}</h4>
+                    <p><strong>Площадь:</strong> ${f.properties.areaSotki} сот.</p>
+                    <p><strong>Статус:</strong> ${f.properties.statusName} </p>
+                `;
+            }
             popup.style.left = (event.pageX + 15) + 'px';
             popup.style.top = (event.pageY - 60) + 'px';
             popup.style.opacity = '1';
@@ -788,9 +827,9 @@
       svg.call(zoom);
 
 // НАЧАЛЬНАЯ НАСТРОЙКА (подберите свои цифры)
-      const initialScale = 0.85;     // масштаб
-      const initialX = 120;          // сдвиг по X (пиксели)
-      const initialY = -25;           // сдвиг по Y
+      const initialScale = 1.6;     // масштаб
+      const initialX = -400;          // сдвиг по X (пиксели)
+      const initialY = 50;           // сдвиг по Y
       svg.call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY).scale(initialScale));
       /*}, 100);*/
     }).catch(error => {
