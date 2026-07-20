@@ -444,6 +444,8 @@
       border-bottom: 3px solid #2f6b3c;
       padding-bottom: 0.5rem;
     }
+
+
   </style>
 </head>
 <body>
@@ -495,7 +497,7 @@
       <div class="hero-image">
         <div class="price-card">
           <div class="price-label">Стоимость участков</div>
-          <div class="price-value"> 200 000 ₽ </i></div>
+          <div class="price-value"> от 200 000 ₽ </i></div>
           <div class="price-per">за сотку</div>
         </div>
         <div class="phone-card">
@@ -515,7 +517,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Подключение D3.js -->
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="js/3djs.js"></script>
 
   <style>
     .svg-container {
@@ -587,15 +589,25 @@
       color: #1f542a;
       font-size: 16px;
     }
+    #about {
+      margin-top: 0px;       /* уменьшить отступ сверху у следующего раздела */
+    }
   </style>
 
   <!--<div id="lotPopup" class="lot-popup" style="display: none;"></div>-->
   <div id="lotPopup" class="lot-popup"></div>
   <h2 id="plan">План поселка</h2>
   <div class="svg-container" id="mapContainer"></div>
+  <div class="download-section" style="text-align: center; margin: 30px 0;">
+    <a href="source/plan.pdf" class="btn-outline btn" download style="background:transparent;">
+      <i class="fas fa-file-pdf"></i> Скачать план поселка (PDF)
+    </a>
+    <p style="font-size: 0.9rem; color: #5e7062; margin-top: 8px;">
+      Актуальная версия генерального плана
+    </p>
+  </div>
 
 
-  <script src="https://d3js.org/d3.v7.min.js"></script>
   <script>
     // ================== НАСТРОЙКИ (измените под себя) ==================
     const LOTS_PATH = 'data/planJson.geojson';   // ← ваш файл с участками
@@ -715,6 +727,7 @@
           f.properties.statusCode = lotDataFromDB[fid].status_code;
           f.properties.price = price;
           f.properties.lotNumber = lotDataFromDB[fid].lot_number;
+          f.properties.desc = lotDataFromDB[fid].desc || [];
         }
         else {
           f.properties.areaSotki = areaSotki;
@@ -771,6 +784,13 @@
           .attr('data-lot', f.properties.lotNumber)
           .on('mouseover', function(event) {
             const popup = document.getElementById('lotPopup');
+            const desc = f.properties.desc || [];
+            let descHtml = '';
+            if (desc.length > 0) {
+              descHtml = '<ul>' + desc.map(item => `<li>${item}</li>`).join('') + '</ul>';
+            } else {
+              descHtml = '<p style="color:#888; font-style:italic;">Нет дополнительных опций</p>';
+            }
             if (!popup) return;
             if (f.properties.statusCode == 'free') {
               popup.innerHTML = `
@@ -780,10 +800,21 @@
                     <p class="price">💰 ${f.properties.price}</p>
                 `;
             }
+            else if (f.properties.statusCode == 'social')
+            {
+              popup.innerHTML = `
+                    <h4>${f.properties.lotNumber}</h4>
+                    <p><strong>Площадь:</strong> ${f.properties.areaSotki} сот.</p>
+                    <div style="margin-top: 8px; border-top: 1px solid #e0e0e0; padding-top: 6px;">
+
+                        ${descHtml}
+                    </div>
+                `;
+            }
             else
             {
               popup.innerHTML = `
-                    <h4>Участок №${f.properties.lotNumber}</h4>
+                    <h4>${f.properties.lotNumber}</h4>
                     <p><strong>Площадь:</strong> ${f.properties.areaSotki} сот.</p>
                     <p><strong>Статус:</strong> ${f.properties.statusName} </p>
                 `;

@@ -21,7 +21,7 @@ try {
         $result[$row['fid']] = [
             'price' => number_format($row['price'], 0, '', ' '),
             'lot_number' => $row['lot_number'],
-            'desc' => $row['desc'],
+            'desc' => json_decode($row['desc'], true),
             'status_code' => $row['status_code'],
             'status_name' => $row['status_name']
         ];
