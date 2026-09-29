@@ -749,18 +749,25 @@
      // ---- Обработка участков ----
      // Функция стиля
      function getStyle(feature) {
-       const status = feature.properties.status || 'free';
+       const props = feature.properties;
+       const fid = props.fid;
+       const dbData = lotDataFromDB[fid] || {};
+       const statusCode = dbData.status_code || props.status_code || 'free';
+       // Цвета по статусам
        const colors = {
-         free: '#a5d6a7',
-         booked: '#ffcc80',
-         sold: '#ef9a9a'
+         free: '#a5d6a7',      // свободен — зелёный
+         booked: '#80ecff',    // забронирован — оранжевый
+         sold: '#ef9a9a',      // продан — красный
+         social: '#ffcc80'     // общественная зона — серый
        };
+
        return {
-         fillColor: colors[status],
+         fillColor: colors[statusCode] || '#a5d6a7',
+         fill: true,
+         fillOpacity: 0.7,
          weight: 1,
-         opacity: 1,
          color: 'white',
-         fillOpacity: 0.7
+         opacity: 1
        };
      }
 
@@ -980,9 +987,9 @@
        const div = L.DomUtil.create('div', 'legend');
        div.innerHTML = `
                     <div><span style="background:#a5d6a7;"></span> Свободен</div>
-                    <div><span style="background:#ffcc80;"></span> Забронирован</div>
+                    <div><span style="background:#80ecff;"></span> Забронирован</div>
                     <div><span style="background:#ef9a9a;"></span> Продан</div>
-                    <div><span style="background:#e0e0e0; border:1px solid #ccc;"></span> Общественная зона</div>
+                    <div><span style="background:#ffcc80; border:1px solid #ccc;"></span> Общественная зона</div>
                 `;
        return div;
      };
