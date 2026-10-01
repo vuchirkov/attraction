@@ -672,7 +672,7 @@
  <script>
    // ================== НАСТРОЙКИ (измените под себя) ==================
    const LOTS_PATH = 'data/plan_new_gws2.geojson';   // ← ваш файл с участками
-   const ROADS_PATH = 'data/roads_new.geojson';     // ← ваш файл с дорогами (LineString)
+   const ROADS_PATH = 'data/roads_new2.geojson';     // ← ваш файл с дорогами (LineString)
    // Если у вас есть реальные данные статусов и цен из БД, заполните realLotData
 
    // В начале, после загрузки GeoJSON, делаем запрос к API
@@ -885,6 +885,12 @@
                     ${descHtml}
                 </div>
             `;
+         } else if (props.statusCode === 'rent') {
+           popup.innerHTML = `
+                <h4>Участок №: ${props.lotNumber}</h4>
+                <p><strong>Площадь:</strong> ${areaSotki} сот.</p>
+                <p><strong>Статус:</strong> ${props.statusName}</p>
+            `;
          } else {
            popup.innerHTML = `
                 <h4>Участок №${fid}</h4>
@@ -925,6 +931,37 @@
        style: getStyle,
        onEachFeature: onEachFeature
      }).addTo(map);
+
+     // Когда создаёте слой дорог, сохраните его в переменную
+     let roadsLayer = null;
+     if (roadsData) {
+       roadsLayer = L.geoJSON(roadsData, {
+         style: {
+           color: '#555',
+           weight: 4,           // начальная толщина
+           opacity: 0.8,
+           lineCap: 'round',
+           lineJoin: 'round'
+         }
+       }).addTo(map);
+     }
+
+// Функция, которая пересчитывает толщину в зависимости от зума
+     function updateRoadsWeight() {
+       if (!roadsLayer) return;
+       const zoom = map.getZoom();
+       // Подберите коэффициенты под свой регион
+       // Например: на zoom 12 — тонкие, на zoom 18 — толстые
+       const weight = Math.max(1, (zoom-14) * 4 );
+       roadsLayer.setStyle({ weight: weight });
+       console.log('Текущий зум:', zoom);
+     }
+
+// Обновляем при каждом изменении зума
+     map.on('zoom', updateRoadsWeight);
+
+// И сразу после загрузки — чтобы толщина соответствовала текущему зуму
+     updateRoadsWeight();
 
 // Кнопка "Где я" в правом верхнем углу
      const locateControl = L.control({ position: 'topright' });
