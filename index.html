@@ -445,14 +445,6 @@
       }
     }
 
-    #plan {
-      font-size: 2rem;
-      margin-top: 2rem;
-      border-bottom: 3px solid #2f6b3c;
-      padding-bottom: 0.5rem;
-    }
-
-
     #map {
       height: 90vh;
       width: 100%;
@@ -495,6 +487,65 @@
     .leaflet-attribution-flag {
       display: none !important;
     }
+    /* Стили плашки */
+    .kp-label-wrapper {
+      background: transparent;
+      border: none;
+    }
+
+
+    .kp-label {
+      width: 180px;              /* ← равно iconSize[0] */
+      box-sizing: border-box;
+      /* остальные стили без изменений */
+      background: linear-gradient(135deg, #2f6b3c, #4c9a5e);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      border: 2px solid #ffffff;
+      position: relative;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .kp-label::before {
+      content: '';
+      position: absolute;
+      right: 6px;
+      bottom: -16px;
+      width: 36px;
+      height: 16px;
+      background: #ffffff;
+      clip-path: polygon(0 0, 100% 0, 100% 100%);
+      border-bottom-right-radius: 6px;
+    }
+
+    .kp-label::after {
+      content: '';
+      position: absolute;
+      right: 8px;
+      bottom: -14px;
+      width: 32px;
+      height: 14px;
+      background: linear-gradient(135deg, #2f6b3c, #4c9a5e);
+      clip-path: polygon(0 0, 100% 0, 100% 100%);
+      border-bottom-right-radius: 4px;
+    }
+
+    .kp-label-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      line-height: 1.2;
+    }
+
+    .kp-label-sub {
+      font-size: 11px;
+      opacity: 0.9;
+      margin-top: 2px;
+      font-weight: 400;
+    }
   </style>
 </head>
 <body>
@@ -519,7 +570,7 @@
       <div class="logo">🌳 Притяжение</div>
       <ul class="nav-links">
         <li><a href="#main">Главная</a></li>
-        <li><a href="#plan">План поселка</a></li>
+        <li><a href="#map">План поселка</a></li>
         <li><a href="#about">О поселке</a></li>
         <li><a href="#connect">Сообщества</a></li>
       </ul>
@@ -535,7 +586,7 @@
         <div class="hero-badge">🏡 Новый уровень загородной жизни</div>
         <h1>Загородный поселок<br>«Притяжение»</h1>
         <p>Берег реки Кама, свежий воздух, развитая инфраструктура. Откройте для себя идеальный баланс загородной жизни и городского комфорта.</p>
-        <a href="#plan" class="btn">Смотреть план поселка →</a>
+        <a href="#map" class="btn">Смотреть план поселка →</a>
         <div class="hero-stats">
           <div class="stat"><span>76 га</span> территории</div>
           <div class="stat"><span>392</span> участка</div>
@@ -578,7 +629,6 @@
       overflow: auto;
       position: relative;
       width: 100%;
-      height: 600;
     }
     .svg-container svg {
       display: block;
@@ -756,9 +806,11 @@
        // Цвета по статусам
        const colors = {
          free: '#a5d6a7',      // свободен — зелёный
-         booked: '#80ecff',    // забронирован — оранжевый
+         book: '#80c0ff',    // забронирован — оранжевый
          sold: '#ef9a9a',      // продан — красный
-         social: '#ffcc80'     // общественная зона — серый
+         social: '#ffcc80',     // общественная зона — серый
+         rent: '#80ffe8',
+         water_well: '#ffcc80'
        };
 
        return {
@@ -887,7 +939,19 @@
             `;
          } else if (props.statusCode === 'rent') {
            popup.innerHTML = `
-                <h4>Участок №: ${props.lotNumber}</h4>
+                <h4>Участок №: ${props.address}</h4>
+                <p><strong>Площадь:</strong> ${areaSotki} сот.</p>
+                <p><strong>Статус:</strong> ${props.statusName}</p>
+            `;
+         } else if (props.statusCode === 'book') {
+           popup.innerHTML = `
+                <h4>Участок №: ${props.address}</h4>
+                <p><strong>Площадь:</strong> ${areaSotki} сот.</p>
+                <p><strong>Статус:</strong> ${props.statusName}</p>
+            `;
+         } else if (props.statusCode === 'water_well') {
+           popup.innerHTML = `
+                <h4>Участок №: ${props.address}</h4>
                 <p><strong>Площадь:</strong> ${areaSotki} сот.</p>
                 <p><strong>Статус:</strong> ${props.statusName}</p>
             `;
@@ -1024,13 +1088,35 @@
        const div = L.DomUtil.create('div', 'legend');
        div.innerHTML = `
                     <div><span style="background:#a5d6a7;"></span> Свободен</div>
-                    <div><span style="background:#80ecff;"></span> Забронирован</div>
+                    <div><span style="background:#80c0ff;"></span> Забронирован</div>
                     <div><span style="background:#ef9a9a;"></span> Продан</div>
                     <div><span style="background:#ffcc80; border:1px solid #ccc;"></span> Общественная зона</div>
+                    <div><span style="background:#80ffe8; border:1px solid #ccc;"></span> Аренда</div>
                 `;
        return div;
      };
      legend.addTo(map);
+
+     const labelCoords = [58.2195, 56.389]; // [широта, долгота]
+
+// Создаём кастомную иконку через DivIcon
+     const labelIcon = L.divIcon({
+       className: 'kp-label-wrapper',   // обёртка без стилей Leaflet
+       html: `
+        <div class="kp-label">
+            <div class="kp-label-title">КП «Притяжение»</div>
+            <div class="kp-label-sub">Загородный посёлок</div>
+        </div>
+    `,
+       iconSize: [180, 60],      // примерный размер плашки
+       iconAnchor: [90, 30]      // "ножка" — центр плашки
+     });
+
+// Добавляем маркер с плашкой
+     L.marker(labelCoords, { icon: labelIcon, interactive: false })
+       .addTo(map);
+
+
 
      // ---- Автоматическое центрирование по границам участков ----
      map.fitBounds(lotsLayer.getBounds());
